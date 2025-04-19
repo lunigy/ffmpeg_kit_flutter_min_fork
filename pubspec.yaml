@@ -1,6 +1,8 @@
 name: ffmpeg_kit_flutter_min
 description: Minimal FFmpeg package for Flutter with updated compatibility
 version: 6.0.4  # Using a newer version number than the original
+homepage: https://github.com/lunigy/ffmpeg_kit_flutter_min_fork
+repository: https://github.com/lunigy/ffmpeg_kit_flutter_min_fork
 
 environment:
   sdk: ">=3.0.0 <4.0.0"  # Updated SDK constraints
