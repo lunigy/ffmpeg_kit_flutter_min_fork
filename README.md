@@ -1,6 +1,6 @@
 # FFmpeg Kit Flutter Min Fork
 
-A forked version of the ffmpeg_kit_flutter_min package updated to be compatible with newer Flutter versions.
+A forked version of ffmpeg_kit_flutter_min with compatibility updates for newer Flutter versions.
 
 This package is based on the original FFmpeg Kit by arthenica, with updates to ensure compatibility with the latest Flutter SDKs.
 
