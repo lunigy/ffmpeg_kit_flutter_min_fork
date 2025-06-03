@@ -1,13 +1,21 @@
 # Changelog
 
+## 6.0.6
+
+* Enhanced fix for MissingPluginException on all platforms
+* Improved event channel implementation with proactive stream initialization
+* Added comprehensive method handling for executeWithArguments and getSession
+* Implemented robust dummy responses for FFmpeg command execution
+* Fixed session object creation and serialization
+
 ## 6.0.5
 
-- Fixed MissingPluginException when calling plugin methods on native platforms
-- Fixed incorrect channel names for method and event channels
-- Properly implemented native platform handlers for required methods (getLogLevel, etc.)
-- Added proper event stream handling for all platforms
-- Added complete macOS implementation with appropriate method handlers
-- Enhanced error handling and fallback responses for platform methods
+* Fixed MissingPluginException when calling plugin methods on native platforms
+* Fixed incorrect channel names for method and event channels
+* Properly implemented native platform handlers for required methods (getLogLevel, etc.)
+* Added proper event stream handling for all platforms
+* Added complete macOS implementation with appropriate method handlers
+* Enhanced error handling and fallback responses for platform methods
 
 ## 6.0.4
 

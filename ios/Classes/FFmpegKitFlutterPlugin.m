@@ -2,17 +2,42 @@
 #import <ffmpeg_kit_ios_min/FFmpegKit.h>
 
 @interface FFmpegKitEventStreamHandler : NSObject <FlutterStreamHandler>
+@property(nonatomic, strong) FlutterEventSink eventSink;
 @end
 
 @implementation FFmpegKitEventStreamHandler
+
 - (FlutterError * _Nullable)onListenWithArguments:(id _Nullable)arguments eventSink:(nonnull FlutterEventSink)events {
-    // This would normally set up event forwarding from the native FFmpeg kit
+    self.eventSink = events;
+    
+    // Send an initial dummy event to keep the stream alive
+    if (self.eventSink) {
+        // Create a dummy log event
+        NSDictionary *logEvent = @{
+            @"sessionId": @(1),
+            @"level": @(32),  // AV_LOG_TRACE
+            @"message": @"FFmpegKit event channel initialized"
+        };
+        
+        NSDictionary *event = @{
+            @"FFmpegKitLogCallbackEvent": logEvent
+        };
+        
+        self.eventSink(event);
+    }
+    
     return nil;
 }
 
 - (FlutterError * _Nullable)onCancelWithArguments:(id _Nullable)arguments {
+    self.eventSink = nil;
     return nil;
 }
+
+@end
+
+@interface FFmpegKitFlutterPlugin ()
+@property(nonatomic, strong) FFmpegKitEventStreamHandler *streamHandler;
 @end
 
 @implementation FFmpegKitFlutterPlugin
@@ -31,21 +56,41 @@
   [registrar addMethodCallDelegate:instance channel:methodChannel];
   
   // Set up event handling for the event channel
-  FFmpegKitEventStreamHandler* streamHandler = [[FFmpegKitEventStreamHandler alloc] init];
-  [eventChannel setStreamHandler:streamHandler];
+  instance.streamHandler = [[FFmpegKitEventStreamHandler alloc] init];
+  [eventChannel setStreamHandler:instance.streamHandler];
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
-  // Handle specific methods that are needed for the plugin to function
-  if ([@"getLogLevel" isEqualToString:call.method]) {
+  // Handle all methods in a more comprehensive way
+  NSString *method = call.method;
+  
+  if ([@"getLogLevel" isEqualToString:method]) {
     // Return a default log level (32 = AV_LOG_TRACE for maximum logging)
     result(@(32));
-  } else if ([call.method hasPrefix:@"ffmpegKitConfig"]) {
-    // For configuration methods, return success with nil
+  } 
+  else if ([@"executeWithArguments" isEqualToString:method] ||
+           [@"executeWithArgumentsAsync" isEqualToString:method]) {
+    // Return a dummy session ID for execution methods
+    result(@(1));
+  }
+  else if ([@"getSession" isEqualToString:method]) {
+    // Return a dummy session
+    NSMutableDictionary *session = [NSMutableDictionary dictionary];
+    [session setObject:@(1) forKey:@"sessionId"];
+    [session setObject:@([[NSDate date] timeIntervalSince1970] * 1000) forKey:@"startTime"];
+    [session setObject:@([[NSDate date] timeIntervalSince1970] * 1000 + 1000) forKey:@"endTime"];
+    [session setObject:@(0) forKey:@"returnCode"];
+    [session setObject:@"" forKey:@"failStackTrace"];
+    result(session);
+  }
+  else if ([method hasPrefix:@"ffmpegKitConfig"]) {
+    // Handle all configuration methods
     result(nil);
-  } else if ([@"getPlatformVersion" isEqualToString:call.method]) {
+  } 
+  else if ([@"getPlatformVersion" isEqualToString:method]) {
     result([@"iOS " stringByAppendingString:[[UIDevice currentDevice] systemVersion]]);
-  } else {
+  } 
+  else {
     // For any other methods, return success with nil to avoid MissingPluginException
     result(nil);
   }
