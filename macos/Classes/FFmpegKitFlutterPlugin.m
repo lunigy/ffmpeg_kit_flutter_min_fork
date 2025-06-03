@@ -1,5 +1,4 @@
 #import "FFmpegKitFlutterPlugin.h"
-#import <ffmpeg_kit_ios_min/FFmpegKit.h>
 
 @interface FFmpegKitEventStreamHandler : NSObject <FlutterStreamHandler>
 @end
@@ -44,7 +43,7 @@
     // For configuration methods, return success with nil
     result(nil);
   } else if ([@"getPlatformVersion" isEqualToString:call.method]) {
-    result([@"iOS " stringByAppendingString:[[UIDevice currentDevice] systemVersion]]);
+    result([@"macOS " stringByAppendingString:[[NSProcessInfo processInfo] operatingSystemVersionString]]);
   } else {
     // For any other methods, return success with nil to avoid MissingPluginException
     result(nil);

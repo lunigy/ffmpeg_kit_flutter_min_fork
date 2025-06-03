@@ -3,7 +3,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'ffmpeg_kit_flutter_min'
-  s.version          = '6.0.4'
+  s.version          = '6.0.5'
   s.summary          = 'FFmpeg Kit for Flutter with minimal configuration (updated fork)'
   s.description      = <<-DESC
   A forked version of the FFmpeg Kit for Flutter (minimal configuration) updated for compatibility with newer Flutter versions.
