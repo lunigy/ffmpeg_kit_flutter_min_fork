@@ -308,19 +308,56 @@ class FFmpegKitInitializer {
   Future<void> _initialize() async {
     print("Loading ffmpeg-kit-flutter.");
 
-    _eventChannel.receiveBroadcastStream().listen(_onEvent, onError: _onError);
+    // Try to initialize the event channel but don't let it fail the whole initialization
+    try {
+      _eventChannel.receiveBroadcastStream().listen(_onEvent, onError: _onError);
+    } catch (e) {
+      print("Warning: FFmpeg event channel initialization failed: $e");
+      print("Event-based callbacks may not work, but other functionality should be available.");
+    }
 
-    final logLevel = await _getLogLevel();
+    // Try to get log level but default to a sensible value if it fails
+    int? logLevel;
+    try {
+      logLevel = await _getLogLevel();
+    } catch (e) {
+      print("Warning: Failed to get log level: $e");
+      // Default to info level (32)
+      logLevel = 32; // AV_LOG_INFO value
+    }
+    
     if (logLevel != null) {
       FFmpegKitConfig.setLogLevel(logLevel);
     }
-    final version = FFmpegKitFactory.getVersion();
-    final platform = await FFmpegKitConfig.getPlatform();
-    final arch = await ArchDetect.getArch();
-    final packageName = await Packages.getPackageName();
-    await FFmpegKitConfig.enableRedirection();
-    final isLTSPostfix = (await FFmpegKitConfig.isLTSBuild()) ? "-lts" : "";
 
+    // Continue with remaining initialization
+    final version = FFmpegKitFactory.getVersion();
+    String platform = "unknown";
+    String arch = "unknown";
+    String packageName = "unknown";
+    bool isLTS = false;
+    
+    try {
+      platform = await FFmpegKitConfig.getPlatform() ?? "unknown";
+      arch = await ArchDetect.getArch() ?? "unknown";
+      packageName = await Packages.getPackageName() ?? "unknown";
+      
+      try {
+        await FFmpegKitConfig.enableRedirection();
+      } catch (e) {
+        print("Warning: Failed to enable redirection: $e");
+      }
+      
+      try {
+        isLTS = await FFmpegKitConfig.isLTSBuild();
+      } catch (e) {
+        print("Warning: Failed to check LTS build: $e");
+      }
+    } catch (e) {
+      print("Warning: Some platform configuration failed: $e");
+    }
+
+    final isLTSPostfix = isLTS ? "-lts" : "";
     final fullVersion = "$platform-$packageName-$arch-$version$isLTSPostfix";
     print("Loaded ffmpeg-kit-flutter-$fullVersion.");
   }

@@ -1,5 +1,13 @@
 # Changelog
 
+## 6.0.7
+
+* Added error resilience to plugin initialization
+* Gracefully handle event channel initialization failures
+* Provide fallback values for platform configuration methods
+* Improved null-safety in platform channel communication
+* Better error handling with detailed logs for troubleshooting
+
 ## 6.0.6
 
 * Enhanced fix for MissingPluginException on all platforms
